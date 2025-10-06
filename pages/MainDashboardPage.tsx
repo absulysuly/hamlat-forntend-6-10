@@ -155,6 +155,9 @@ const Modal: React.FC<{ feature: Feature | null, onClose: () => void }> = ({ fea
         <div 
             className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4"
             onClick={onClose}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
         >
             <div 
                 className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto flex flex-col"
@@ -163,7 +166,7 @@ const Modal: React.FC<{ feature: Feature | null, onClose: () => void }> = ({ fea
                 <div className={`p-6 bg-gradient-to-br ${feature.colorClass} text-white flex items-center gap-4 sticky top-0`}>
                      <div className="flex-shrink-0">{feature.icon}</div>
                     <div>
-                        <h3 className="text-2xl font-bold">{feature.title}</h3>
+                        <h3 id="modal-title" className="text-2xl font-bold">{feature.title}</h3>
                         <p className="opacity-90 text-sm">{feature.description}</p>
                     </div>
                 </div>

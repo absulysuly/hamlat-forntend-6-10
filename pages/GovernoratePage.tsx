@@ -4,7 +4,6 @@ import Card from '../components/ui/Card';
 import { IRAQ_GOVERNORATES } from '../constants';
 import { Candidate, NewsArticle } from '../types';
 import CheckCircleIcon from '../components/icons/CheckCircleIcon';
-import StarIcon from '../components/icons/StarIcon';
 
 const mockCandidates: Candidate[] = [
     { id: 1, name: 'أحمد علي', party: 'تحالف النصر', imageUrl: 'https://picsum.photos/200/200?random=1', verified: true },
@@ -13,13 +12,9 @@ const mockCandidates: Candidate[] = [
     { id: 4, name: 'مريم جاسم', party: 'الحزب الديمقراطي الكردستاني', imageUrl: 'https://picsum.photos/200/200?random=4', verified: true },
     { id: 5, name: 'حسن عبدالله', party: 'مستقل', imageUrl: 'https://picsum.photos/200/200?random=5', verified: true },
     { id: 6, name: 'زينب محمد', party: 'تحالف الفتح', imageUrl: 'https://picsum.photos/200/200?random=6', verified: false },
-];
-
-const mockFeaturedCandidates: Candidate[] = [
     { id: 7, name: 'يوسف القاسم', party: 'ائتلاف الوطنية', imageUrl: 'https://picsum.photos/200/200?random=7', verified: true },
     { id: 8, name: 'نور الهدى', party: 'مستقل', imageUrl: 'https://picsum.photos/200/200?random=8', verified: true },
 ];
-
 
 const mockNews: NewsArticle[] = [
     { id: 1, title: 'انطلاق الحملات الانتخابية في المحافظة', summary: 'بدأ المرشحون حملاتهم الانتخابية مع التركيز على القضايا المحلية والخدمية...', date: '2025-09-15' },
@@ -27,13 +22,12 @@ const mockNews: NewsArticle[] = [
     { id: 3, title: 'نقاشات حول البرامج الانتخابية للمرشحين الشباب', summary: 'شهدت المدينة ندوة حوارية شارك فيها عدد من المرشحين الشباب لعرض رؤاهم المستقبلية...', date: '2025-09-12' },
 ];
 
-const CandidateCard: React.FC<{ candidate: Candidate; isFeatured?: boolean }> = ({ candidate, isFeatured = false }) => (
-    <Card className={`flex items-center space-x-4 space-x-reverse hover:shadow-lg transition-shadow ${isFeatured ? 'bg-green-50' : ''}`}>
+const CandidateCard: React.FC<{ candidate: Candidate }> = ({ candidate }) => (
+    <Card className="flex items-center space-x-4 space-x-reverse hover:shadow-lg transition-shadow">
         <img src={candidate.imageUrl} alt={candidate.name} className="w-20 h-20 rounded-full object-cover" />
         <div className="flex-1">
             <div className="flex items-center">
                 <h3 className="text-xl font-bold text-gray-900">{candidate.name}</h3>
-                {isFeatured && <StarIcon className="w-5 h-5 text-yellow-500 mr-2" />}
             </div>
             <p className="text-gray-600">{candidate.party}</p>
             {candidate.verified && (
@@ -82,17 +76,6 @@ const GovernoratePage: React.FC = () => {
                     </p>
                 </div>
                 
-                {/* Featured Candidates (Halo Section) */}
-                <section className="mb-12">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-right border-r-4 border-yellow-500 pr-4 flex items-center justify-between">
-                        <span>المرشحون المميزون</span>
-                        <StarIcon className="w-6 h-6 text-yellow-500"/>
-                    </h2>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {mockFeaturedCandidates.map(c => <CandidateCard key={c.id} candidate={c} isFeatured />)}
-                    </div>
-                </section>
-
                 <div className="grid lg:grid-cols-3 gap-12">
                     <div className="lg:col-span-2">
                         <h2 className="text-3xl font-bold text-gray-800 mb-6 text-right border-r-4 border-[#007a3d] pr-4">جميع المرشحين في {governorate.name}</h2>
