@@ -36,7 +36,7 @@ const translations = {
 };
 
 const CountdownTimer: React.FC<{ lang: 'ar' | 'en' | 'ku' }> = ({ lang }) => {
-    const electionDate = new Date('2025-10-10T08:00:00');
+    const electionDate = new Date('2025-11-11T07:00:00');
     const [days, hours, minutes, seconds] = useCountdown(electionDate);
     const t = translations[lang];
 

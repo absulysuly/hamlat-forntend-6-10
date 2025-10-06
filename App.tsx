@@ -1,6 +1,5 @@
-// FIX: Replaced placeholder content with a functional App component that sets up React Router for the application.
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import LandingPage from './pages/LandingPage';
@@ -16,49 +15,65 @@ import InformationPortalPage from './pages/InformationPortalPage';
 import DigitalTransparencyPlatformPage from './pages/DigitalTransparencyPlatformPage';
 import ElectionInformationPlatformPage from './pages/ElectionInformationPlatformPage';
 import DigitalDashboardPage from './pages/DigitalDashboardPage';
+import MainDashboardPage from './pages/MainDashboardPage';
+import PlatformHomePage from './pages/PlatformHomePage';
 
-const AppLayout: React.FC<{ language: 'ar' | 'en' | 'ku', setLanguage: (lang: 'ar' | 'en' | 'ku') => void }> = ({ language, setLanguage }) => {
-    
-    useEffect(() => {
-        document.documentElement.lang = language;
-        document.documentElement.dir = language === 'ar' || language === 'ku' ? 'rtl' : 'ltr';
-    }, [language]);
+type Language = 'ar' | 'en' | 'ku';
 
-    return (
-      <div>
-        <Header currentLang={language} onLangChange={setLanguage} />
-        <main>
-          <Outlet />
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
+const App: React.FC = () => {
+  const [language, setLanguage] = useState<Language>('ar');
+
+  const handleLangChange = (lang: Language) => {
+    setLanguage(lang);
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' || lang === 'ku' ? 'rtl' : 'ltr';
+  };
+
+  useEffect(() => {
+    handleLangChange('ar'); // Set initial language and direction
+  }, []);
+
+
+  return (
+    <Router>
+      <ScrollToTop />
+      <div className="flex flex-col min-h-screen">
+        <Header currentLang={language} onLangChange={handleLangChange} />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<LandingPage language={language} />} />
+            <Route path="/main-dashboard" element={<MainDashboardPage />} />
+            <Route path="/candidate-dashboard" element={<DashboardPage />} />
+            <Route path="/integrity-hub" element={<IntegrityHubPage />} />
+            <Route path="/governorate/:name" element={<GovernoratePage />} />
+            <Route path="/international-portal" element={<InternationalPortalPage />} />
+            <Route path="/party/:id" element={<PoliticalPartyPage />} />
+            <Route path="/parties" element={<PoliticalPartyPortalPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/election-hub" element={<ElectionHubPage />} />
+            <Route path="/information-portal" element={<InformationPortalPage language={language} />} />
+            <Route path="/digital-transparency" element={<DigitalTransparencyPlatformPage />} />
+            <Route path="/election-info" element={<ElectionInformationPlatformPage />} />
+            <Route path="/digital-dashboard" element={<DigitalDashboardPage language={language} setLanguage={setLanguage} />} />
+            <Route path="/platform-home" element={<PlatformHomePage />} />
+            {/* Redirect legacy dashboard route to main-dashboard */}
+            <Route path="/dashboard" element={<MainDashboardPage />} />
+          </Routes>
         </main>
         <Footer />
       </div>
-    );
-};
-
-const App: React.FC = () => {
-    const [language, setLanguage] = useState<'ar' | 'en' | 'ku'>('ar');
-
-    return (
-        <Router>
-            <Routes>
-                <Route element={<AppLayout language={language} setLanguage={setLanguage} />}>
-                    <Route path="/" element={<LandingPage language={language} />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/integrity-hub" element={<IntegrityHubPage />} />
-                    <Route path="/governorate/:name" element={<GovernoratePage />} />
-                    <Route path="/international-portal" element={<InternationalPortalPage />} />
-                    <Route path="/party/:id" element={<PoliticalPartyPage />} />
-                    <Route path="/parties" element={<PoliticalPartyPortalPage />} />
-                    <Route path="/pricing" element={<PricingPage />} />
-                    <Route path="/election-hub" element={<ElectionHubPage />} />
-                    <Route path="/information-portal" element={<InformationPortalPage language={language} />} />
-                    <Route path="/digital-transparency" element={<DigitalTransparencyPlatformPage />} />
-                    <Route path="/election-information-platform" element={<ElectionInformationPlatformPage />} />
-                    <Route path="/digital-dashboard" element={<DigitalDashboardPage language={language} setLanguage={setLanguage} />} />
-                </Route>
-            </Routes>
-        </Router>
-    );
+    </Router>
+  );
 };
 
 export default App;
