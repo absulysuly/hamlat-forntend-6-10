@@ -6,7 +6,7 @@ import Textarea from '../components/ui/Textarea';
 import Button from '../components/ui/Button';
 import { IRAQ_GOVERNORATES } from '../constants';
 import DocumentTextIcon from '../components/icons/DocumentTextIcon';
-import UsersIcon from '../components/icons/UsersIcon';
+import { submitIntegrityReport } from '../services/api';
 
 const IhecDirectLinks: React.FC = () => (
     <Card className="mb-12">
@@ -27,12 +27,25 @@ const IhecDirectLinks: React.FC = () => (
 
 
 const IntegrityHubPage: React.FC = () => {
-    const [submitted, setSubmitted] = React.useState(false);
+    const [submissionState, setSubmissionState] = React.useState<{ status: 'idle' | 'submitting' | 'success' | 'error', message: string, trackingId?: string }>({ status: 'idle', message: '' });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Handle form submission logic here
-        setSubmitted(true);
+        setSubmissionState({ status: 'submitting', message: '' });
+
+        const formData = new FormData(e.currentTarget);
+        
+        try {
+            // Windsurf Integration Point: Calling the data access layer to submit the report.
+            const response = await submitIntegrityReport(formData);
+            if (response.success) {
+                setSubmissionState({ status: 'success', message: '', trackingId: response.trackingId });
+            } else {
+                 throw new Error('Submission failed, please try again.');
+            }
+        } catch (error) {
+            setSubmissionState({ status: 'error', message: error instanceof Error ? error.message : 'An unknown error occurred' });
+        }
     };
 
     return (
@@ -48,7 +61,7 @@ const IntegrityHubPage: React.FC = () => {
                     
                     <IhecDirectLinks />
 
-                    {submitted ? (
+                    {submissionState.status === 'success' ? (
                          <Card className="text-center">
                             <div className="flex justify-center mb-4">
                                 <div className="p-4 bg-green-100 rounded-full">
@@ -56,22 +69,22 @@ const IntegrityHubPage: React.FC = () => {
                                 </div>
                             </div>
                             <h2 className="text-3xl font-bold text-gray-800 mb-3">تم استلام بلاغك بنجاح!</h2>
-                            <p className="text-gray-600 mb-2">رقم المتابعة الخاص بك هو: <span className="font-mono bg-gray-200 p-1 rounded">IQ-2025-1A3B5C</span></p>
+                            <p className="text-gray-600 mb-2">رقم المتابعة الخاص بك هو: <span className="font-mono bg-gray-200 p-1 rounded">{submissionState.trackingId}</span></p>
                             <p className="text-gray-600">شكرًا لك على مساهمتك في الحفاظ على نزاهة العملية الانتخابية. سيقوم فريقنا بمراجعة البلاغ واتخاذ الإجراءات اللازمة.</p>
-                            <Button onClick={() => setSubmitted(false)} className="mt-6">تقديم بلاغ آخر</Button>
+                            <Button onClick={() => setSubmissionState({ status: 'idle', message: '' })} className="mt-6">تقديم بلاغ آخر</Button>
                         </Card>
                     ) : (
                         <Card>
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 <h2 className="text-2xl font-bold text-gray-800 border-b pb-4">تفاصيل البلاغ</h2>
                                 <div className="grid md:grid-cols-2 gap-8">
-                                    <Select id="governorate" label="المحافظة" required>
+                                    <Select id="governorate" name="governorate" label="المحافظة" required>
                                         <option value="">اختر محافظة</option>
                                         {IRAQ_GOVERNORATES.map(gov => (
                                             <option key={gov.id} value={gov.id}>{gov.name}</option>
                                         ))}
                                     </Select>
-                                     <Select id="violation-type" label="نوع المخالفة" required>
+                                     <Select id="violation-type" name="violationType" label="نوع المخالفة" required>
                                         <option value="">اختر نوع المخالفة</option>
                                         <option value="improper_campaigning">دعاية انتخابية مخالفة (تمزيق صور، خارج الأوقات المحددة)</option>
                                         <option value="hate_speech">خطاب كراهية أو تحريض</option>
@@ -82,19 +95,28 @@ const IntegrityHubPage: React.FC = () => {
                                 </div>
                                 <Textarea
                                     id="description"
+                                    name="description"
                                     label="وصف المخالفة"
                                     placeholder="يرجى تقديم وصف تفصيلي للمخالفة، بما في ذلك الزمان والمكان والأشخاص المتورطين إن أمكن."
                                     required
                                 />
                                 <Input
                                     id="evidence"
+                                    name="evidence"
                                     type="file"
                                     label="إرفاق دليل (صورة، فيديو، مستند)"
                                     accept="image/*,video/*,.pdf,.doc,.docx"
                                 />
                                 <div className="pt-4 text-center">
-                                    <Button type="submit" className="w-full md:w-auto">إرسال البلاغ</Button>
+                                    <Button type="submit" className="w-full md:w-auto" disabled={submissionState.status === 'submitting'}>
+                                        {submissionState.status === 'submitting' ? 'جار الإرسال...' : 'إرسال البلاغ'}
+                                    </Button>
                                 </div>
+                                {submissionState.status === 'error' && (
+                                    <p className="text-center text-sm text-red-500 pt-2">
+                                        حدث خطأ: {submissionState.message}
+                                    </p>
+                                )}
                                  <p className="text-center text-sm text-gray-500 pt-4">
                                     نحن نضمن سرية معلوماتك. سيتم التعامل مع جميع البلاغات بأقصى درجات الخصوصية.
                                 </p>

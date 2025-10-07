@@ -8,6 +8,7 @@ import IntegrityHubPage from './pages/IntegrityHubPage';
 import GovernoratePage from './pages/GovernoratePage';
 import InternationalPortalPage from './pages/InternationalPortalPage';
 import PoliticalPartyPortalPage from './pages/PoliticalPartyPortalPage';
+import PoliticalPartyPage from './pages/PoliticalPartyPage';
 import PricingPage from './pages/PricingPage';
 import ElectionHubPage from './pages/ElectionHubPage';
 import DigitalTransparencyPlatformPage from './pages/DigitalTransparencyPlatformPage';
@@ -53,6 +54,7 @@ const App: React.FC = () => {
             <Route path="/governorate/:name" element={<GovernoratePage />} />
             <Route path="/international-portal" element={<InternationalPortalPage />} />
             <Route path="/parties" element={<PoliticalPartyPortalPage />} />
+            <Route path="/party/:id" element={<PoliticalPartyPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/election-hub" element={<ElectionHubPage />} />
             <Route path="/digital-transparency" element={<DigitalTransparencyPlatformPage />} />
